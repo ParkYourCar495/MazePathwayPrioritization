@@ -1,0 +1,8 @@
+﻿  FullPathAlgorithm.cpp
+C:\Users\ethga\OneDrive\Desktop\C++ Files\FullPathAlgorithm\Minheaptree.h(20,19): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'FullPathAlgorithm.cpp')
+  
+C:\Users\ethga\OneDrive\Desktop\C++ Files\FullPathAlgorithm\Minheaptree.h(52,19): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'FullPathAlgorithm.cpp')
+  
+  FullPathAlgorithm.vcxproj -> C:\Users\ethga\OneDrive\Desktop\C++ Files\FullPathAlgorithm\x64\Debug\FullPathAlgorithm.exe
