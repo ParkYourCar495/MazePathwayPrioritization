@@ -19,6 +19,8 @@ Version: 1.0
 # include <cctype>
 #include "Node.h"
 #include "Minheaptree.h"
+#include "Maze.h"
+
 using namespace std;
 
 // Pathfinding prototype
@@ -26,6 +28,9 @@ void Pathfinding();
 
 // addMaze prototype
 void addMaze();
+
+// instantiateMazeObject prototype
+void instantiateMazeObject();
 
 // Pathfind prototype
 void Pathfind(vector<vector<char>> maze, int next_y, int next_x, int time, vector<vector<int>> path, Minheaptree& minheap);
@@ -38,21 +43,29 @@ bool imported_maze = false;
 int max_x = 0;
 int max_y = 0;
 
+//Random Maze Variables
+int maze_Width = 0;
+int maze_Height = 0;
+Maze* maze = nullptr;
 
 
 int main() {
 
     int choice = -1;
-    
+
+    //Intialize random seed
+    std::srand(std::time(nullptr));
+
     while (choice != 0) {
 
         // USER MENU UI
-        cout << "\n===== Maze Path Prioritization =====\n";
-        cout << "1. Start Pathfinding\n";
-        cout << "2. Add Maze Map\n";
-        cout << "0. Exit\n";
-        cout << "Choice: ";
-        cin >> choice;
+        std::cout << "\n===== Maze Path Prioritization =====\n";
+        std::cout << "1. Start Pathfinding\n";
+        std::cout << "2. Add Maze Map\n";
+        std::cout << "3. Generate Random Maze Map\n";
+        std::cout << "0. Exit\n";
+        std::cout << "Choice: ";
+        std::cin >> choice;
 
         // CHOICES
         switch (choice) {
@@ -65,7 +78,7 @@ int main() {
             }
             else 
             { 
-                cout << "No maze has been imported yet."; 
+                std::cout << "No maze has been imported yet."; 
             } 
             break;
         case 2: 
@@ -73,9 +86,14 @@ int main() {
             //imported_maze = true; 
             break;
 
+        case 3:
+            instantiateMazeObject();
+            
+            break;
+
             // EXIT AND CLOSE OPERATION
         case 0: break;
-        default: cout << "Invalid option.\n";
+        default: std::cout << "Invalid option.\n";
         }
     }
 
@@ -83,9 +101,9 @@ int main() {
 }
 void addMaze()//Imports a maze over global the_maze
 {
-    cout << "Enter the txt file within the current directory of the maze you wish to import: ";
+    std::cout << "Enter the txt file within the current directory of the maze you wish to import: ";
     string the_file;
-    cin >> the_file;
+    std::cin >> the_file;
     
     
     
@@ -113,30 +131,124 @@ void addMaze()//Imports a maze over global the_maze
     max_y = -1;
 
     //Displays the maze and calculates the max indexes for x and y
-    cout << "  ";
+    std::cout << "  ";
     for (int y = 0; y < the_maze[0].size(); y++)
     {
-        cout << y % 10;
+        std::cout << y % 10;
     }
-    cout << endl;
+    std::cout << std::endl;
     for (int y = 0; y < the_maze.size(); y++)
     {
-        cout << y << " ";
+        std::cout << y << " ";
         max_y += 1;
         for (int x = 0; x < the_maze[y].size(); x++)
         {
-            cout << the_maze[y][x];
+            std::cout << the_maze[y][x];
             if (max_y == 0)
             {
                 max_x += 1;
             }
         }
-        cout << endl;
+        std::cout << std::endl;
     }
     imported_maze = true;
     
     
 }
+
+// Function to instantiate the maze object from user input
+void instantiateMazeObject() {
+
+    int userInput = 0;
+    bool done = false;
+    bool regenerate = true;
+
+    while (regenerate) {
+
+        //NOTE: maze is limited to a fixed size of 200x200
+        //WARNING: Currently UNSTABLE for large values. HIGH chance of stack overflow as dimensions increase.
+        //TODO: Implement Exception Handler --- Limit Max Dimensions
+
+        std::cout << "Enter Maze Width: ";
+        std::cin >> maze_Width;
+
+        std::cout << "Enter Maze Height : ";
+        std::cin >> maze_Height;
+        std::cout << std::endl;
+
+        done = false;
+        
+        while (!done) {
+            
+            if (regenerate) {
+
+                if (maze != nullptr) {
+                    delete maze;
+                    maze = nullptr;
+                }
+
+                maze = new Maze(maze_Height, maze_Width);
+                maze->generate_maze();
+            }
+            
+            //Maze Generation UI
+            std::cout << "---Maze Menu---" << std::endl;
+            std::cout << "1. Regenerate Maze" << std::endl;
+            std::cout << "2. Enter New Dimensions" << std::endl;
+            std::cout << "3. Finalize Maze" << std::endl;
+			std::cout << "Enter Selection: ";
+            std::cin >> userInput;
+
+            //NOTE: As of now, no functionality for 'O'. Maze will only generate walls and empty spaces.
+            //**    Starting position is fixed at (1, 1). Finished position is randomly generated.
+            //**    Maze will have to be regenerated each time to reposition 'F'
+            //TODO: Add user options for customizing 'S' and 'F' locations
+
+            switch (userInput) {
+            case 1: 
+                delete maze;
+                maze = nullptr;
+                regenerate = true;
+                std::cout << std::endl;
+                break;
+
+            case 2:
+                delete maze;
+                maze = nullptr;
+                regenerate = true;
+                done = true;
+                std::cout << std::endl;
+                break;
+
+            case 3:
+                regenerate = false;
+                done = true;
+                break;
+
+            default:
+                done = false;
+                regenerate = false;
+				std::cout << "Invalid Input. Please Re-Enter Selection:\n" << std::endl;
+            }       
+        }
+    }
+
+    //Converts the maze from a 2D array into a 2D vector
+    the_maze = maze->convertMazeToVector();
+
+    //Delete the maze object to free memory
+    delete maze;
+    maze = nullptr;
+
+	//Sets max maze indices 
+    max_y = maze_Height - 1;
+    max_x = maze_Width - 1;
+
+    //Load Maze
+    imported_maze = true;
+}
+
+
 void Pathfinding()
 {
     Minheaptree the_heap; //Creates a minheap
@@ -178,16 +290,16 @@ void Pathfinding()
     }
     if (start_y == -1 || start_x == -1) //Stops the function if there is no starting position
     {
-        cout << "Error: No starting position found." << endl;;
+        std::cout << "Error: No starting position found." << std::endl;;
         return;
     }
     if (finish_exists==false) //Stops if no finish position found
     {
-        cout << "Error: No finishing position found." << endl;;
+        std::cout << "Error: No finishing position found." << std::endl;;
         return;
     }
     Pathfind(the_maze, start_y, start_x,0,{},the_heap); //Starts the recursive functions traversal
-    cout << endl;
+    std::cout << std::endl;
     the_heap.RemoveAndReturnFirstNode(); //Removes and prints the first node
 
     
@@ -237,5 +349,4 @@ void Pathfind(vector<vector<char>> maze, int next_y, int next_x, int time, vecto
             Pathfind(maze, next_y , next_x-1 , time, path, minheap);
         }
     }
-    
 }
