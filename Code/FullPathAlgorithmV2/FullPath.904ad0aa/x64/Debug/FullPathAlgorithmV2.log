@@ -1,0 +1,9 @@
+﻿  FullPathAlgorithmV2.cpp
+C:\Users\ethga\OneDrive\Desktop\C++ Files\FullPathAlgorithmV2\Minheaptree.h(18,23): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'FullPathAlgorithmV2.cpp')
+  
+C:\Users\ethga\OneDrive\Desktop\C++ Files\FullPathAlgorithmV2\FullPathAlgorithmV2.cpp(56,25): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\ethga\OneDrive\Desktop\C++ Files\FullPathAlgorithmV2\FullPathAlgorithmV2.cpp(261,16): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\ethga\OneDrive\Desktop\C++ Files\FullPathAlgorithmV2\FullPathAlgorithmV2.cpp(262,15): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\ethga\OneDrive\Desktop\C++ Files\FullPathAlgorithmV2\FullPathAlgorithmV2.cpp(400,16): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  FullPathAlgorithmV2.vcxproj -> C:\Users\ethga\OneDrive\Desktop\C++ Files\FullPathAlgorithmV2\x64\Debug\FullPathAlgorithmV2.exe
