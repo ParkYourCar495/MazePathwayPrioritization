@@ -61,7 +61,9 @@ void Maze::initialize_maze()
 void Maze::print()
 {
 	int Y = 0; int X = 0;
-	
+
+	std::cout << "\x1B[2J\x1B[H";
+
 	while (Y != MAZE_HEIGHT) {
 		while (X != MAZE_WIDTH) {
 			std::cout << maze[Y][X];

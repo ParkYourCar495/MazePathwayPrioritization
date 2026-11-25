@@ -1,10 +1,10 @@
 /*********************************************
 TEAM ZA
-Kaleb Parker, Ethan Garrigus, E E
+Kaleb Parker, Ethan Garrigus, Jacob Blackmon
 CSCEA311 Group Project
 Date Completed: November 9, 2026
 Description: [DESCRIPTION]
-Version: 1.0
+Version: 1.0 
 *********************************************/
 
 # include <iostream>
@@ -20,6 +20,7 @@ Version: 1.0
 #include "Node.h"
 #include "Minheaptree.h"
 #include "Maze.h"
+#include "Visualizer.h"
 
 using namespace std;
 
@@ -35,15 +36,20 @@ void instantiateMazeObject();
 // Pathfind prototype
 void Pathfind(vector<vector<char>> maze, int next_y, int next_x, int time, vector<vector<int>> path, Minheaptree& minheap);
 
-//Maze vector
+//Global Maze vector
 vector<vector<char>> the_maze;
+
+//Visual Maze Object
+Visualizer mazeVisual;
+
 //Check to see if a maze has been imported
 bool imported_maze = false;
+
 //integers to set the max indexes of the maze x and y
 int max_x = 0;
 int max_y = 0;
 
-//Random Maze Variables
+//Procedural Maze Variables
 int maze_Width = 0;
 int maze_Height = 0;
 Maze* maze = nullptr;
@@ -52,6 +58,7 @@ Maze* maze = nullptr;
 int main() {
 
     int choice = -1;
+    
 
     //Intialize random seed
     std::srand(std::time(nullptr));
@@ -88,7 +95,6 @@ int main() {
 
         case 3:
             instantiateMazeObject();
-            
             break;
 
             // EXIT AND CLOSE OPERATION
@@ -152,8 +158,7 @@ void addMaze()//Imports a maze over global the_maze
         std::cout << std::endl;
     }
     imported_maze = true;
-    
-    
+    mazeVisual.setMaze(&the_maze);
 }
 
 // Function to instantiate the maze object from user input
@@ -167,6 +172,8 @@ void instantiateMazeObject() {
 
         //NOTE: maze is limited to a fixed size of 200x200
         //WARNING: Currently UNSTABLE for large values. HIGH chance of stack overflow as dimensions increase.
+        //         **Narrowed down to get_random_position() function when deciding which wall to remove. 
+        //         **Occurs when Wall is width 3, and distance is one. Causes an error in rand() stl function.
         //TODO: Implement Exception Handler --- Limit Max Dimensions
 
         std::cout << "Enter Maze Width: ";
@@ -246,6 +253,7 @@ void instantiateMazeObject() {
 
     //Load Maze
     imported_maze = true;
+    mazeVisual.setMaze(&the_maze);
 }
 
 
@@ -298,15 +306,39 @@ void Pathfinding()
         std::cout << "Error: No finishing position found." << std::endl;;
         return;
     }
-    Pathfind(the_maze, start_y, start_x,0,{},the_heap); //Starts the recursive functions traversal
-    std::cout << std::endl;
-    the_heap.RemoveAndReturnFirstNode(); //Removes and prints the first node
 
-    
+    mazeVisual.begin();
+    Pathfind(the_maze, start_y, start_x,0,{},the_heap); //Starts the recursive functions traversal
+    std::vector<std::vector<int>> finalPath = the_heap.RemoveAndReturnFirstNode(); //Removes and prints the first node
+    std::cout << std::endl;
+    mazeVisual.DrawOptimalPath(finalPath); 
+    mazeVisual.end();
+
+    if (finalPath.empty()) {
+        std::cout << "Error: Maze has no solvable paths.";
+        return;
+    }
+    else {
+        std::cout << std::endl;
+        std::cout << "The time of the shortest path is " << finalPath.back()[0] << ".\n";
+        std::cout << "The coordinates of an applicable shortest path is: ";
+        finalPath.pop_back();
+
+        int size = finalPath.size();
+        for (int i = 0; i < size; i++) {
+            cout << "(" << finalPath[i][0] << "," << finalPath[i][1] << ") ";
+        }
+        std::cout << std::endl;
+    }
 }
+
+
 void Pathfind(vector<vector<char>> maze, int next_y, int next_x, int time, vector<vector<int>> path, Minheaptree& minheap)
 {
     path.push_back({next_x,next_y});//Adds current position to the path
+
+    mazeVisual.setPosition(next_y, next_x); //Set Current Position On Map
+    mazeVisual.PrintMaze();                 //Draw Map State
 
     if (maze[next_y][next_x] == '.'|| maze[next_y][next_x] == 'F')//increment time by 1 on a period or F
     {
@@ -330,8 +362,7 @@ void Pathfind(vector<vector<char>> maze, int next_y, int next_x, int time, vecto
     else //Proceeds otherwise
     {
         maze[next_y][next_x] = 'X'; //Mark current position as X, so it doesn't repeat this spot
-
-
+    
         if (next_x+1 <= max_x)//Go right
         {
             Pathfind(maze,  next_y, next_x+1, time,  path, minheap);

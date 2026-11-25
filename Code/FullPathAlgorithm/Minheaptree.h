@@ -15,8 +15,6 @@ public:
             }
         }
 
-
-
         int count = minheap_array.size();
         Node* new_temp = new Node;
         new_temp->time = i_time;
@@ -41,20 +39,28 @@ public:
             }
         }
     }
-    void RemoveAndReturnFirstNode() {
+    std::vector<std::vector<int>> RemoveAndReturnFirstNode() {
+
+        vector<vector<int>> return_path;
+
         if (minheap_array.size() == 0)
         {
-            cout << "No paths detected in the minheap." << endl;
-            return;
+            //cout << "Error: Maze Has No Solution." << endl;
+            //Now returns an empty vector if no path exists.
+            return return_path ;
         }
-        vector<vector<int>> return_path = minheap_array[0]->path;
+
+        return_path = minheap_array[0]->path;
+
         int return_time = minheap_array[0]->time;
         int count = minheap_array.size();
+
         delete minheap_array[0];
         minheap_array[0] = nullptr;
         minheap_array[0] = minheap_array[count - 1];
         minheap_array[count - 1] = nullptr;
         minheap_array.pop_back();
+
         int iteration = 0;
         while (minheap_array.size() > 2 * iteration + 2 && (minheap_array[iteration]->time > minheap_array[2 * iteration + 1]->time ||
             minheap_array[iteration]->time > minheap_array[2 * iteration + 2]->time))
@@ -74,14 +80,22 @@ public:
             }
         }
 
+        std::vector<int> time;
+        time.push_back(return_time);
+        return_path.push_back(time);
 
-        //print the former first node's stats
+        return return_path;
+
+        //Moved to PathFinding()
+        /*//print the former first node's stats
         cout << "The time of the shortest path is " << return_time << "."<<endl;
         cout << "The coordinates of an applicable shortest path is: ";
+
         for (int i = 0; i < return_path.size(); i++)
         {
             cout << "("<<return_path[i][0] << "," << return_path[i][1] << ") ";
         }
+        */
     }
 
 
